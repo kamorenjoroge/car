@@ -1,82 +1,9 @@
 import { FaCheckCircle, FaCar } from 'react-icons/fa';
 import Link from 'next/link';
 import Image from 'next/image';
+import { carCategories } from '@/lib/data';
 
-const carCategories = [
-  {
-    title: "Safari 4x4 Vehicles",
-    description: "Rugged off-road vehicles perfect for Kenyan terrain",
-    image: "/suv-prado.jpg",
-    priceFrom: "12,000",
-    features: [
-      "4WD capability",
-      "High ground clearance",
-      "Spacious for gear",
-      "Experienced safari drivers"
-    ],
-    popular: true
-  },
-  {
-    title: "Economy Cars",
-    description: "Fuel-efficient options for city driving",
-    image: "/sedan-corolla.jpg",
-    priceFrom: "4,500",
-    features: [
-      "Great fuel economy",
-      "Compact size",
-      "AC & modern features",
-      "Ideal for 1-3 passengers"
-    ]
-  },
-  {
-    title: "Luxury Sedans",
-    description: "Premium comfort for business or leisure",
-    image: "/sedan-corolla.jpg",
-    priceFrom: "15,000",
-    features: [
-      "Leather interiors",
-      "Premium sound system",
-      "Executive class",
-      "Chauffeur available"
-    ]
-  },
-  {
-    title: "Family SUVs",
-    description: "Spacious vehicles for family trips",
-    image: "/suv-prado.jpg",
-    priceFrom: "8,000",
-    features: [
-      "7-8 passenger capacity",
-      "Child seat options",
-      "Ample luggage space",
-      "Comfortable for long drives"
-    ]
-  },
-  {
-    title: "VIP Luxury",
-    description: "Top-tier vehicles for special occasions",
-    image: "/luxury-mercedes.jpg",
-    priceFrom: "25,000",
-    features: [
-      "Latest model luxury cars",
-      "Privacy features",
-      "Professional chauffeur",
-      "Airport transfers"
-    ]
-  },
-  {
-    title: "Minibuses",
-    description: "For group travel and tours",
-    image: "/hero-cars.jpg",
-    priceFrom: "10,000",
-    features: [
-      "12-25 passenger capacity",
-      "Tour guide compatible",
-      "Luggage trailers available",
-      "Custom safari packages"
-    ]
-  }
-];
+
 
 const CarGrid = () => {
   return (
