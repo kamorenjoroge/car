@@ -1,23 +1,40 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaCalendarAlt, FaIdCard, FaCar, FaUser, FaMoneyBillWave,  } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
 import { allCars } from '@/lib/data';
 
 interface BookingPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 function BookingPage({ params }: BookingPageProps) {
   const router = useRouter();
-  const { id } = params;
+  const [carId, setCarId] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Resolve the params promise
+  useEffect(() => {
+    const resolveParams = async () => {
+      try {
+        const resolvedParams = await params;
+        setCarId(resolvedParams.id);
+      } catch (error) {
+        console.error('Failed to resolve params:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    resolveParams();
+  }, [params]);
 
   // Find the selected car
-  const selectedCar = allCars.find(car => car.id === Number(id));
+  const selectedCar = allCars.find(car => car.id === Number(carId));
   const dailyPrice = selectedCar?.pricePerDay || 0;
 
   const [formData, setFormData] = useState({
@@ -77,6 +94,20 @@ function BookingPage({ params }: BookingPageProps) {
       setIsSubmitting(false);
     }
   };
+
+  // Show loading state while resolving params
+  if (isLoading) {
+    return (
+      <div className="bg-white py-12">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <span className="ml-2 text-earth">Loading...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white py-12">
