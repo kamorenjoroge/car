@@ -6,14 +6,17 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
-export default function Page({ params }: PageProps) {
+export default async function Page({ params }: PageProps) {
+  // Await the params since it's now a Promise in Next.js 15
+  const { id } = await params;
+  
   // Find the car with matching ID
-  const car = allCars.find(car => car.id === Number(params.id));
+  const car = allCars.find(car => car.id === Number(id));
 
   // Return 404 if car not found
   if (!car) {
