@@ -1,12 +1,25 @@
-// app/booking/page.tsx
 "use client";
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { FaCalendarAlt, FaIdCard, FaCar, FaUser } from 'react-icons/fa';
-import { toast } from 'react-hot-toast';
 
-export default function BookingPage() {
+import { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import { FaCalendarAlt, FaIdCard, FaCar, FaUser, FaMoneyBillWave,  } from 'react-icons/fa';
+import { toast } from 'react-hot-toast';
+import { allCars } from '@/lib/data';
+
+interface BookingPageProps {
+  params: {
+    id: string;
+  };
+}
+
+function BookingPage({ params }: BookingPageProps) {
   const router = useRouter();
+  const { id } = params;
+
+  // Find the selected car
+  const selectedCar = allCars.find(car => car.id === Number(id));
+  const dailyPrice = selectedCar?.pricePerDay || 0;
+
   const [formData, setFormData] = useState({
     pickupDate: '',
     returnDate: '',
@@ -18,6 +31,7 @@ export default function BookingPage() {
     drivingLicense: '',
     specialRequests: ''
   });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -25,7 +39,7 @@ export default function BookingPage() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const calculateDays = () => {
+  const rentalDays = useMemo(() => {
     if (formData.pickupDate && formData.returnDate) {
       const start = new Date(formData.pickupDate);
       const end = new Date(formData.returnDate);
@@ -33,7 +47,11 @@ export default function BookingPage() {
       return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     }
     return 0;
-  };
+  }, [formData.pickupDate, formData.returnDate]);
+
+  const totalPrice = useMemo(() => {
+    return rentalDays * dailyPrice;
+  }, [rentalDays, dailyPrice]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,18 +80,43 @@ export default function BookingPage() {
 
   return (
     <div className="bg-white py-12">
-      <div className="container mx-auto px-4 max-w-4xl">
+      <div className="container mx-auto px-4">
         <h1 className="text-3xl font-bold text-earth mb-2">Complete Your Booking</h1>
         <p className="text-earth/80 mb-8">Fill in your details to reserve your vehicle</p>
+        
+        {/* Vehicle Details Section */}
+        <div className="bg-secondary/10 p-6 rounded-lg mb-8">
+          <h2 className="text-2xl font-semibold text-earth mb-4 flex items-center gap-2">
+            <FaCar className="text-primary" />
+            Vehicle Details
+          </h2>
+          {selectedCar ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <h3 className="text-lg font-medium text-earth">{selectedCar.name}</h3>
+                <p className="text-earth/70 capitalize">{selectedCar.category.replace(/-/g, ' ')}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-earth/70">Daily Rate:</p>
+                <p className="text-xl font-bold text-primary">
+                  KES {dailyPrice.toLocaleString()}
+                  <span className="text-sm font-normal text-earth/60">/day</span>
+                </p>
+              </div>
+            </div>
+          ) : (
+            <p className="text-earth/70">No vehicle selected</p>
+          )}
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Date Selection */}
+          {/* Date Selection & Price Summary */}
           <div className="bg-secondary/10 p-6 rounded-lg">
             <h2 className="text-xl font-semibold text-earth mb-4 flex items-center gap-2">
               <FaCalendarAlt className="text-primary" />
               Rental Period
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
                 <label htmlFor="pickupDate" className="block text-sm font-medium text-earth mb-1">
                   Pickup Date
@@ -105,10 +148,29 @@ export default function BookingPage() {
                 />
               </div>
             </div>
-            {calculateDays() > 0 && (
-              <p className="mt-3 text-sm text-earth/60">
-                Rental duration: {calculateDays()} day{calculateDays() !== 1 ? 's' : ''}
-              </p>
+
+            {/* Price Summary */}
+            {rentalDays > 0 && (
+              <div className="bg-white p-4 rounded-lg border border-earth/20">
+                <h3 className="text-lg font-semibold text-earth mb-3 flex items-center gap-2">
+                  <FaMoneyBillWave className="text-primary" />
+                  Rental Summary
+                </h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-earth/70">Daily Rate:</span>
+                    <span className="font-medium">KES {dailyPrice.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-earth/70">Rental Duration:</span>
+                    <span className="font-medium">{rentalDays} day{rentalDays !== 1 ? 's' : ''}</span>
+                  </div>
+                  <div className="border-t border-earth/20 pt-2 flex justify-between">
+                    <span className="text-earth font-medium">Total Amount:</span>
+                    <span className="text-xl font-bold text-primary">KES {totalPrice.toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
 
@@ -264,3 +326,5 @@ export default function BookingPage() {
     </div>
   );
 }
+
+export default BookingPage;

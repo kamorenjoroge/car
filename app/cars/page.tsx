@@ -28,7 +28,7 @@ const CATEGORIES = {
   'vip-luxury': 'VIP Luxury'
 };
 
-export default function CarsPage() {
+function CarsPage() {
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get('category') || 'all';
   
@@ -277,3 +277,5 @@ export default function CarsPage() {
     </div>
   );
 }
+
+export default CarsPage;
